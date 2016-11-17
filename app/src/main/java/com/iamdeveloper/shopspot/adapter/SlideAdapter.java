@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.iamdeveloper.shopspot.R;
 import com.iamdeveloper.shopspot.onClick.OnItemClick;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,7 @@ public class SlideAdapter extends RecyclerView.Adapter<SlideAdapter.ViewHolder> 
     private OnItemClick itemClick;
     private Context ctx;
     private ArrayList<String> imageList = new ArrayList<>();
-
+    private int[] viewType = {1,0,1,0,1,0,1,0,1,0};
     public SlideAdapter(ArrayList<String> list,Context ctx, OnItemClick itemClick) {
         this.imageList = list;
         this.ctx = ctx;
@@ -35,19 +36,20 @@ public class SlideAdapter extends RecyclerView.Adapter<SlideAdapter.ViewHolder> 
     }
 
 
-    private class TextHolder extends ViewHolder {
-         TextView textView;
+    private class FirstImageHolder extends ViewHolder {
+         ImageView imageView;
 
-         TextHolder(View v) {
+        FirstImageHolder(View v) {
             super(v);
+            imageView = (ImageView) v.findViewById(R.id.image);
 
         }
     }
 
-    private class ImageHolder extends ViewHolder {
-        private ImageView imageView;
+    private class SecondImageHolder extends ViewHolder {
+         ImageView imageView;
 
-        private ImageHolder(View itemView) {
+        SecondImageHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.image);
         }
@@ -58,11 +60,11 @@ public class SlideAdapter extends RecyclerView.Adapter<SlideAdapter.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case 0:
-                //View firstview = inflater.inflate(R.layout.content_text, parent, false);
-                //return new TextHolder(firstview);
+                View firstview = inflater.inflate(R.layout.content_recyclerview_1, parent, false);
+                return new FirstImageHolder(firstview);
             case 1:
-                View secondview = inflater.inflate(R.layout.content_image, parent, false);
-                return new ImageHolder(secondview);
+                View secondview = inflater.inflate(R.layout.content_recyclerview_2, parent, false);
+                return new SecondImageHolder(secondview);
 
         }
         return null;
@@ -79,23 +81,23 @@ public class SlideAdapter extends RecyclerView.Adapter<SlideAdapter.ViewHolder> 
 
         switch (holder.getItemViewType()) {
             case 0:
-                TextHolder holder1 = (TextHolder) holder;
-                //holder1.textView.setText(data[position]);
+                FirstImageHolder holder1 = (FirstImageHolder) holder;
+                Picasso.with(ctx).load(imageList.get(position)).into(holder1.imageView);
                 break;
             case 1:
-                ImageHolder holder2 = (ImageHolder) holder;
-                //holder2.imageView.setImage();
+                SecondImageHolder holder2 = (SecondImageHolder) holder;
+                Picasso.with(ctx).load(imageList.get(position)).into(holder2.imageView);
                 break;
         }
     }
 
     @Override
     public int getItemCount() {
-        return 1;
+        return imageList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return 9;
+        return viewType[position];
     }
 }

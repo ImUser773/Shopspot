@@ -3,6 +3,7 @@ package com.iamdeveloper.shopspot.activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.View;
 
 import com.iamdeveloper.shopspot.R;
 import com.iamdeveloper.shopspot.adapter.RecycleAdapter;
+import com.iamdeveloper.shopspot.adapter.SlideAdapter;
 import com.iamdeveloper.shopspot.model.ImageModel;
 import com.iamdeveloper.shopspot.onClick.OnItemClick;
 import com.iamdeveloper.shopspot.rest.ImageInterface;
@@ -23,9 +25,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private RecyclerView recyclerView;
-
-    private RecyclerView.Adapter adapter;
+    private RecyclerView recyclerView,slidingRecyclerView;
+    private RecyclerView.Adapter recyclerAapter;
+    private RecyclerView.Adapter slidingAdapter;
     private ArrayList<String> imageList = new ArrayList<String>();
     private static List<ImageModel.ResultsBean> model;
 
@@ -34,10 +36,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindView();
-
-
-
-
         if(savedInstanceState != null){
             Log.i(TAG, "not null");
         }else {
@@ -63,12 +61,13 @@ public class MainActivity extends AppCompatActivity {
         imageList = savedInstanceState.getStringArrayList("KEY");
         if (imageList != null){
             recyclerViewConfig();
-
+            slidingRecyclerViewConfig();
         }
     }
 
     private void bindView() {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        slidingRecyclerView = (RecyclerView) findViewById(R.id.slidingRecyclerView);
 
     }
 
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, String.valueOf(imageList.get(i)));
                 }
                 recyclerViewConfig();
+                slidingRecyclerViewConfig();
 
 
             }
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void recyclerViewConfig() {
-        adapter = new RecycleAdapter(imageList, this, new OnItemClick() {
+        recyclerAapter = new RecycleAdapter(imageList, this, new OnItemClick() {
             @Override
             public void onItemClick(View v, int position) {
 
@@ -120,7 +120,25 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,1));
         recyclerView.setNestedScrollingEnabled(false);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(recyclerAapter);
     }
 
+    private void slidingRecyclerViewConfig() {
+        slidingAdapter = new SlideAdapter(imageList, this, new OnItemClick() {
+            @Override
+            public void onItemClick(View v, int position) {
+
+                Log.i("name",model.size() +"");
+                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                i.putExtra("image",model.get(position).getUrl());
+                i.putExtra("name",model.get(position).getType());
+                i.putExtra("date",model.get(position).getCreatedAt());
+                startActivity(i);
+            }
+        });
+        slidingRecyclerView.setHasFixedSize(true);
+        slidingRecyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        slidingRecyclerView.setNestedScrollingEnabled(false);
+        slidingRecyclerView.setAdapter(slidingAdapter);
+    }
 }
